@@ -36,13 +36,21 @@ namespace StellarAge.BattleAnalyse.ViewModel
             var savedItem = SaveToFile.DeSerializeObject<BattleSettingsItem>(StorFileName);
             if (savedItem != null)
             {
-                foreach (var unit in AttackUnits)
-                {
-                    var saveItem = savedItem.AttackUnits.FirstOrDefault(pp => pp.Name == unit.Name);
-                    if (saveItem == null) continue;
-                    Mapper.Map(saveItem, unit);
-                }
+                InitViewUnits(savedItem.AttackUnits, AttackUnits);
+                InitViewUnits(savedItem.DefenceUnits, DefenceUnits);
+                InitViewUnits(savedItem.DefenceTurrels, DefenceTurrels);
             }
+        }
+
+        void InitViewUnits(List<UnitsView> savedUnits, List<UnitsView> currentUnits)
+        {
+            foreach (var unit in currentUnits)
+            {
+                var saveItem = savedUnits.FirstOrDefault(pp => pp.Name == unit.Name);
+                if (saveItem == null) continue;
+                Mapper.Map(saveItem, unit);
+            }
+
         }
 
         private string StorFileName => _storFileName ?? (_storFileName = Path.Combine(Environment.GetFolderPath(
