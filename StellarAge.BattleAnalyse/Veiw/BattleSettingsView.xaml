@@ -18,6 +18,9 @@
             <Button Command="{Binding StartSimulationCommand}">
                 <Image Source="/StellarAge.BattleAnalyse;component/Images/play-button.png" Height="16"/>
             </Button>
+            <Button Command="{Binding SaveCommand}">
+                <Image Source="/StellarAge.BattleAnalyse;component/Images/save-file-option.png" Height="16"/>
+            </Button>
         </ToolBar>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
