@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="StellarAge.BattleAnalyse.Veiw.BattleSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:StellarAge.BattleAnalyse.Veiw"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:controls="clr-namespace:StellarAge.BattleAnalyse.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ToolBar>
+            <Button Command="{Binding StartSimulationCommand}">
+                <Image Source="/StellarAge.BattleAnalyse;component/Images/play-button.png" Height="16"/>
+            </Button>
+        </ToolBar>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <controls:UnitsControl DataContext="{Binding BattleSettingsItem.AttackUnits}"/>
+            <controls:UnitsControl Grid.Column="1" DataContext="{Binding BattleSettingsItem.DefenceUnits}"/>
+            <controls:UnitsControl Grid.Column="2" DataContext="{Binding BattleSettingsItem.DefenceTurrels}"/>
+        </Grid>
+    </Grid>
+</UserControl>
+
