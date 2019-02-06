@@ -194,5 +194,11 @@
     <Resource Include="Images\TN.png" />
     <Resource Include="Images\TT.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\wpftoolkit\ExtendedWPFToolkitSolution\Src\Xceed.Wpf.Toolkit\Xceed.Wpf.Toolkit.csproj">
+      <Project>{72e591d6-8f83-4d8c-8f67-9c325e623234}</Project>
+      <Name>Xceed.Wpf.Toolkit</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
