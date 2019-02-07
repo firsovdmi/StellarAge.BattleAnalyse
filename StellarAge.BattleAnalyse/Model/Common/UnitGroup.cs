@@ -40,7 +40,7 @@ namespace StellarAge.BattleAnalyse.Model.Common
         public void TakeDamage(long attackPower)
         {
             // сначала атакуем раненый юнит. Если удалось его добить, едем дальше...
-            var damagetUnits = AliveUnits.Where(p => p.CurrentArmor < p.NominalArmor);
+            var damagetUnits = AliveUnits.Where(p => p.CurrentArmor < p.NominalArmor).ToList();
             foreach (var damagetUnit in damagetUnits)
             {
                 if (damagetUnit.CurrentArmor > attackPower)
@@ -54,8 +54,8 @@ namespace StellarAge.BattleAnalyse.Model.Common
 
             // вычисляем, сколько юнитов уничтожено
             var completelyDestroyedUnitCount = (int)(attackPower / UnitArmor);
-            var attackPowerForLastUnit = attackPower % completelyDestroyedUnitCount;
-            foreach (var unit in Units.Take(completelyDestroyedUnitCount))
+            var attackPowerForLastUnit = completelyDestroyedUnitCount == 0 ? attackPower : attackPower % completelyDestroyedUnitCount;
+            foreach (var unit in AliveUnits.Take(completelyDestroyedUnitCount).ToList())
             {
                 unit.Destroy();
             }

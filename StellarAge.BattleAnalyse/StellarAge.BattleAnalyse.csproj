@@ -85,7 +85,9 @@
     <Compile Include="Controls\UnitsControl.xaml.cs">
       <DependentUpon>UnitsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\ExtendedRelayCommand.cs" />
     <Compile Include="Infrastructure\SaveToFile.cs" />
+    <Compile Include="Infrastructure\SimBattleException.cs" />
     <Compile Include="Log\LogBattle.cs" />
     <Compile Include="Log\LogFleet.cs" />
     <Compile Include="Log\LogRound.cs" />

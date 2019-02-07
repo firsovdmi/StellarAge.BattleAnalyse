@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StellarAge.BattleAnalyse.Infrastructure;
 using StellarAge.BattleAnalyse.Log;
 using StellarAge.BattleAnalyse.Model.Common;
 
@@ -13,38 +14,44 @@ namespace StellarAge.BattleAnalyse.Model.Battle
 
         public LogBattle SimBattle()
         {
+            if (AttackFleet.Any(p => p.AttackPower == 0 || p.NominalArmor == 0))
+            {
+                throw new SimBattleException("Не задана атака или броня");
+            }
             var attackTypes = GetUnitGroups(AttackFleet);
             var defenceShipTypes = GetUnitGroups(DefenceFleet);
             var defenceTurrelTypes = GetUnitGroups(DefenceTurrels);
 
-            attackTypes.ForEach(p => p.ResetArmor());
-            defenceShipTypes.ForEach(p => p.ResetArmor());
-            defenceTurrelTypes.ForEach(p => p.ResetArmor());
+            attackTypes.ResetArmor();
+            defenceShipTypes.ResetArmor();
+            defenceTurrelTypes.ResetArmor();
             var logBattle = new LogBattle();
-            while (attackTypes.Any() && (defenceShipTypes.Any() || defenceTurrelTypes.Any()))
+            while (attackTypes.AnyAlive && (defenceShipTypes.AnyAlive || defenceTurrelTypes.AnyAlive))
             {
+                var a = attackTypes.Items.Sum(p => p.AliveUnits.Count);
+                var d = defenceShipTypes.Items.Sum(p => p.AliveUnits.Count);
                 // Раунд Атакующего
-                var logRound = ExecuteRoundWithLog(attackTypes, defenceShipTypes, defenceTurrelTypes, attackTypes, defenceShipTypes.Concat(defenceTurrelTypes).ToList());
+                var logRound = ExecuteRoundWithLog(attackTypes.Items, defenceShipTypes.Items, defenceTurrelTypes.Items, attackTypes.Items, defenceShipTypes.Items.Concat(defenceTurrelTypes.Items).ToList());
                 logBattle.Rounds.Add(logRound);
 
                 // Раунд кораблей Обороняющегося
-                if (defenceShipTypes.Any() && attackTypes.Any())
+                if (defenceShipTypes.AnyAlive && attackTypes.AnyAlive)
                 {
-                    logRound = ExecuteRoundWithLog(attackTypes, defenceShipTypes, defenceTurrelTypes, defenceShipTypes, attackTypes);
+                    logRound = ExecuteRoundWithLog(attackTypes.Items, defenceShipTypes.Items, defenceTurrelTypes.Items, defenceShipTypes.Items, attackTypes.Items);
                     logBattle.Rounds.Add(logRound);
                 }
 
                 // Раунд пушек Обороняющегося
-                if (defenceTurrelTypes.Any() && attackTypes.Any())
+                if (defenceTurrelTypes.AnyAlive && attackTypes.AnyAlive)
                 {
-                    logRound = ExecuteRoundWithLog(attackTypes, defenceShipTypes, defenceTurrelTypes, defenceTurrelTypes, attackTypes, defenceShipTypes.Any());
+                    logRound = ExecuteRoundWithLog(attackTypes.Items, defenceShipTypes.Items, defenceTurrelTypes.Items, defenceTurrelTypes.Items, attackTypes.Items, defenceShipTypes.AnyAlive);
                     logBattle.Rounds.Add(logRound);
                 }
             }
             return logBattle;
         }
 
-        private LogRound ExecuteRoundWithLog(List<UnitGroup> attackTypes, List<UnitGroup> defenceShipTypes, List<UnitGroup> defenceTurrelTypes, List<UnitGroup> currentAttackTypes, List<UnitGroup> currentDefenceShipTypes, bool isDefenceTakeDamage=true)
+        private LogRound ExecuteRoundWithLog(List<UnitGroup> attackTypes, List<UnitGroup> defenceShipTypes, List<UnitGroup> defenceTurrelTypes, List<UnitGroup> currentAttackTypes, List<UnitGroup> currentDefenceShipTypes, bool isDefenceTakeDamage = true)
         {
             var logRound = new LogRound
             {
@@ -92,14 +99,14 @@ namespace StellarAge.BattleAnalyse.Model.Battle
 
         private RoundResult ExecuteRound(IEnumerable<UnitGroup> attackTypes, IEnumerable<UnitGroup> defenceTypes, bool isDefenceTakeDamage)
         {
-            var currentAttackType = attackTypes.OrderByDescending(p => p.Weight).FirstOrDefault();
+            var currentAttackType = attackTypes.OrderBy(p => p.Weight).FirstOrDefault();
             if (currentAttackType == null)
             {
                 return null;
             }
             var currentDefenceType = currentAttackType.SelectTarget(defenceTypes);
             var storredDefenceAttackPower = currentDefenceType.AllAliveUnitsAttackPower;
-            if(isDefenceTakeDamage) currentDefenceType.TakeDamage(currentAttackType.AllAliveUnitsAttackPower);
+            if (isDefenceTakeDamage) currentDefenceType.TakeDamage(currentAttackType.AllAliveUnitsAttackPower);
             currentAttackType.TakeDamage(storredDefenceAttackPower);
             return new RoundResult
             {
@@ -108,14 +115,29 @@ namespace StellarAge.BattleAnalyse.Model.Battle
             };
         }
 
-        private List<UnitGroup> GetUnitGroups(IEnumerable<Unit> items)
+        private UnitGroups GetUnitGroups(IEnumerable<Unit> items)
         {
-            var ret =
+            var ret = new UnitGroups(
                 items.GroupBy(p => p.GetType()).Select(p => new UnitGroup
                 {
                     Units = p.ToList()
-                }).ToList();
+                }).ToList());
             return ret;
+        }
+
+        public class UnitGroups
+        {
+            public UnitGroups(List<UnitGroup> items = null)
+            {
+                Items = items ?? new List<UnitGroup>();
+            }
+            public List<UnitGroup> Items { get; set; }
+            public bool AnyAlive => Items.Any(p => p.AliveUnits.Count > 0);
+
+            public void ResetArmor()
+            {
+                Items.ForEach(p => p.ResetArmor());
+            }
         }
     }
 }

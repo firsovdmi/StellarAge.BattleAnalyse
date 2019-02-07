@@ -6,6 +6,7 @@ using AutoMapper;
 using StellarAge.BattleAnalyse.Log;
 using StellarAge.BattleAnalyse.Model.Battle;
 using StellarAge.BattleAnalyse.Model.Common;
+using StellarAge.BattleAnalyse.Model.Ships;
 using StellarAge.BattleAnalyse.Model.Turrels;
 using StellarAge.BattleAnalyse.ViewModel;
 
@@ -48,25 +49,43 @@ namespace StellarAge.BattleAnalyse.Services
                 .Where(t => t.IsSubclassOf(unitType))
                 .ToList();
             var ret = itemTypes.Select(p => (Unit)Activator.CreateInstance(p)).ToList();
-            return ret.OrderBy(p=>p.Weight).ToList();
+            return ret.OrderBy(p => p.Weight).ToList();
         }
 
         public LogBattle ExecuteBattle(BattleSettingsItem battleSettingsItem)
         {
             var battle = new Battle();
-            battle.AttackFleet = GetDefaultUnits(typeof(Ship));
-            battle.DefenceFleet = GetDefaultUnits(typeof(Ship));
-            battle.DefenceTurrels = GetDefaultUnits(typeof(Turrel));
-
-            battle.AttackFleet.ForEach(p =>
-            {
-                var unitView = battleSettingsItem.AttackUnits.FirstOrDefault(pp => pp.Name == p.GetType().Name);
-                if (unitView != null)
-                {
-                    Mapper.Map(unitView, p);
-                }
-            });
+            battle.AttackFleet = GetUnitsFromViewGroups(battleSettingsItem.AttackUnits);
+            battle.DefenceFleet = GetUnitsFromViewGroups(battleSettingsItem.DefenceUnits);
+            battle.DefenceTurrels = GetUnitsFromViewGroups(battleSettingsItem.DefenceTurrels);
+           
             var ret = battle.SimBattle();
+            return ret;
+        }
+
+        List<Unit> GetUnitsFromViewGroups(List<UnitsView> unitsView)
+        {
+            var ret = new List<Unit>();
+            foreach (var unitView in unitsView)
+            {
+                var unitsGroup = GetUnitsFromView(unitView);
+                ret.AddRange(unitsGroup);
+            }
+            return ret;
+        }
+        List<Unit> GetUnitsFromView(UnitsView unitView)
+        {
+            var ret=new List<Unit>();
+            var unitType = Assembly
+                .GetAssembly(GetType())
+                .GetTypes().FirstOrDefault(t => t.Name == unitView.ClassName);
+            if (unitType == null) return ret;
+            for (var i = 0; i < unitView.Count; i++)
+            {
+                var newUnit = (Unit)Activator.CreateInstance(unitType);
+                Mapper.Map(unitView, newUnit);
+                ret.Add(newUnit);
+            }
             return ret;
         }
     }

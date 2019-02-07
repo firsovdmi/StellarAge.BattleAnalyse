@@ -19,27 +19,51 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn  Header="Объем" Binding="{Binding Weight}" IsReadOnly="True"  Width="*"/>
-                <DataGridTemplateColumn Header="Атака" Width="*">
+                <DataGridTemplateColumn Header="Атака одного" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding AttackPower}" />
+                            <TextBlock Text="{Binding UnitAttackPower}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <xctk:IntegerUpDown Value="{Binding AttackPower}" Minimum="0"/>
+                            <xctk:IntegerUpDown Value="{Binding UnitAttackPower, UpdateSourceTrigger=PropertyChanged}" Minimum="0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Броня" Width="*">
+                <DataGridTemplateColumn Header="Атака всех" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Armor}" />
+                            <TextBlock Text="{Binding TotalAttackPower}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <xctk:IntegerUpDown Value="{Binding Armor}" Minimum="0"/>
+                            <xctk:IntegerUpDown Value="{Binding TotalAttackPower, UpdateSourceTrigger=PropertyChanged}" Minimum="0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Броня одного" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding UnitArmor}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <xctk:IntegerUpDown Value="{Binding UnitArmor, UpdateSourceTrigger=PropertyChanged}" Minimum="0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Броня всех" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding TotalArmor}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <xctk:IntegerUpDown Value="{Binding TotalArmor, UpdateSourceTrigger=PropertyChanged}" Minimum="0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
@@ -51,7 +75,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <xctk:IntegerUpDown Value="{Binding Count}" Minimum="0"/>
+                            <xctk:IntegerUpDown Value="{Binding Count, UpdateSourceTrigger=PropertyChanged}" Minimum="0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>

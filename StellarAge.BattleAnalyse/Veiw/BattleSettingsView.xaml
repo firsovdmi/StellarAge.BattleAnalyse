@@ -15,10 +15,10 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <ToolBar>
-            <Button Command="{Binding StartSimulationCommand}">
+            <Button Command="{Binding StartSimulationCommand}" ToolTip="{Binding StartSimulationCommand.ToolTip}">
                 <Image Source="/StellarAge.BattleAnalyse;component/Images/play-button.png" Height="16"/>
             </Button>
-            <Button Command="{Binding SaveCommand}">
+            <Button Command="{Binding SaveCommand}" ToolTip="{Binding SaveCommand.ToolTip}">
                 <Image Source="/StellarAge.BattleAnalyse;component/Images/save-file-option.png" Height="16"/>
             </Button>
         </ToolBar>

@@ -14,10 +14,10 @@ namespace StellarAge.BattleAnalyse.ViewModel
     class BattleSettingsViewModel
     {
         private readonly BattleService _battleService;
-        private RelayCommand<CancelEventArgs> _closingCommand;
-        private RelayCommand<CancelEventArgs> _startSimulationCommand;
+        private ExtendedRelayCommand<CancelEventArgs> _closingCommand;
+        private ExtendedRelayCommand<CancelEventArgs> _startSimulationCommand;
         private string _storFileName;
-        private RelayCommand<CancelEventArgs> _saveCommand;
+        private ExtendedRelayCommand<CancelEventArgs> _saveCommand;
 
         public BattleSettingsItem BattleSettingsItem { get; set; }
         public List<UnitsView> AttackUnits => BattleSettingsItem.AttackUnits;
@@ -40,6 +40,9 @@ namespace StellarAge.BattleAnalyse.ViewModel
                 InitViewUnits(savedItem.DefenceUnits, DefenceUnits);
                 InitViewUnits(savedItem.DefenceTurrels, DefenceTurrels);
             }
+#if DEBUG
+            _battleService.ExecuteBattle(BattleSettingsItem);
+#endif
         }
 
         void InitViewUnits(List<UnitsView> savedUnits, List<UnitsView> currentUnits)
@@ -58,8 +61,8 @@ namespace StellarAge.BattleAnalyse.ViewModel
                                            "StellarAge.BattleAnalyse.BattleSettingsItem.data"));
 
 
-        public RelayCommand<CancelEventArgs> ClosingCommand => _closingCommand ?? (_closingCommand =
-                                                                   new RelayCommand<CancelEventArgs>(ExecuteClosingCommand, CanExecuteClosingCommand));
+        public ExtendedRelayCommand<CancelEventArgs> ClosingCommand => _closingCommand ?? (_closingCommand =
+                                                                   new ExtendedRelayCommand<CancelEventArgs>(ExecuteClosingCommand, CanExecuteClosingCommand));
 
         private bool CanExecuteClosingCommand(CancelEventArgs arg)
         {
@@ -71,8 +74,8 @@ namespace StellarAge.BattleAnalyse.ViewModel
             SaveToFile.SerializeObject(BattleSettingsItem, StorFileName);
         }
 
-        public RelayCommand<CancelEventArgs> SaveCommand => _saveCommand ?? (_saveCommand =
-                                                                   new RelayCommand<CancelEventArgs>(ExecuteSaveCommand, CanExecuteSaveCommand));
+        public ExtendedRelayCommand<CancelEventArgs> SaveCommand => _saveCommand ?? (_saveCommand =
+                                                                   new ExtendedRelayCommand<CancelEventArgs>(ExecuteSaveCommand, CanExecuteSaveCommand,"Сохранить настройки"));
 
         private bool CanExecuteSaveCommand(CancelEventArgs arg)
         {
@@ -84,8 +87,8 @@ namespace StellarAge.BattleAnalyse.ViewModel
             SaveToFile.SerializeObject(BattleSettingsItem, StorFileName);
         }
 
-        public RelayCommand<CancelEventArgs> StartSimulationCommand => _startSimulationCommand ?? (_startSimulationCommand =
-                                                                   new RelayCommand<CancelEventArgs>(ExecuteStartSimulationCommand, CanExecuteStartSimulationCommand));
+        public ExtendedRelayCommand<CancelEventArgs> StartSimulationCommand => _startSimulationCommand ?? (_startSimulationCommand =
+                                                                   new ExtendedRelayCommand<CancelEventArgs>(ExecuteStartSimulationCommand, CanExecuteStartSimulationCommand, "Запустить симуляцию"));
 
         private bool CanExecuteStartSimulationCommand(CancelEventArgs arg)
         {
