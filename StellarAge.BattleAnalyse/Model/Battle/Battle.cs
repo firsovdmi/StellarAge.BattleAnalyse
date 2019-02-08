@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Formatters;
 using StellarAge.BattleAnalyse.Infrastructure;
 using StellarAge.BattleAnalyse.Log;
 using StellarAge.BattleAnalyse.Model.Common;
@@ -8,75 +9,98 @@ namespace StellarAge.BattleAnalyse.Model.Battle
 {
     class Battle
     {
-        public List<Unit> AttackFleet { get; set; }
-        public List<Unit> DefenceFleet { get; set; }
-        public List<Unit> DefenceTurrels { get; set; }
+        public List<Hand> AttackHands { get; set; }
+        public List<Hand> DefenceHands { get; set; }
+        public List<UnitGroup> DefenceTurrelsGroups { get; set; }
 
         public LogBattle SimBattle()
         {
-            if (AttackFleet.Any(p => p.AttackPower == 0 || p.NominalArmor == 0))
-            {
-                throw new SimBattleException("Не задана атака или броня");
-            }
-            var attackTypes = GetUnitGroups(AttackFleet);
-            var defenceShipTypes = GetUnitGroups(DefenceFleet);
-            var defenceTurrelTypes = GetUnitGroups(DefenceTurrels);
 
-            attackTypes.ResetArmor();
-            defenceShipTypes.ResetArmor();
-            defenceTurrelTypes.ResetArmor();
             var logBattle = new LogBattle();
-            while (attackTypes.AnyAlive && (defenceShipTypes.AnyAlive || defenceTurrelTypes.AnyAlive))
+
+
+            while (AttackHands.Any(p => p.AnyAlive)
+                   && (AttackHands.Any(p => p.AnyAlive) || DefenceTurrelsGroups.Any(p => p.AliveUnits.Any())))
             {
-                var a = attackTypes.Items.Sum(p => p.AliveUnits.Count);
-                var d = defenceShipTypes.Items.Sum(p => p.AliveUnits.Count);
                 // Раунд Атакующего
-                var logRound = ExecuteRoundWithLog(attackTypes.Items, defenceShipTypes.Items, defenceTurrelTypes.Items, attackTypes.Items, defenceShipTypes.Items.Concat(defenceTurrelTypes.Items).ToList());
+                var values = SelectAttackUnits(AttackHands);
+                var attackHand = values.Hand;
+                var attackUnitsGroup = values.Group;
+                var defenceHand = DefenceHands.Where(p => p.AnyAlive).OrderBy(p => p.AttackOrder).FirstOrDefault() ??
+                                  new Hand {UnitGroups = DefenceTurrelsGroups};
+                var logRound = ExecuteRoundWithLog(attackHand, defenceHand, DefenceTurrelsGroups, attackUnitsGroup);
                 logBattle.Rounds.Add(logRound);
 
                 // Раунд кораблей Обороняющегося
-                if (defenceShipTypes.AnyAlive && attackTypes.AnyAlive)
+                values = SelectAttackUnits(DefenceHands);
+                attackHand = values.Hand;
+                attackUnitsGroup = values.Group;
+                defenceHand = AttackHands.Where(p => p.AnyAlive).OrderBy(p => p.AttackOrder).FirstOrDefault();
+                if (defenceHand?.AnyAlive == true && attackHand?.AnyAlive == true)
                 {
-                    logRound = ExecuteRoundWithLog(attackTypes.Items, defenceShipTypes.Items, defenceTurrelTypes.Items, defenceShipTypes.Items, attackTypes.Items);
+                    logRound = ExecuteRoundWithLog(attackHand, defenceHand, DefenceTurrelsGroups, attackUnitsGroup);
                     logBattle.Rounds.Add(logRound);
                 }
 
                 // Раунд пушек Обороняющегося
-                if (defenceTurrelTypes.AnyAlive && attackTypes.AnyAlive)
+                values = SelectAttackUnits(DefenceTurrelsGroups);
+                attackHand = values.Hand;
+                attackUnitsGroup = values.Group;
+                defenceHand = AttackHands.Where(p => p.AnyAlive).OrderBy(p => p.AttackOrder).FirstOrDefault();
+                if (defenceHand?.AnyAlive == true && attackHand?.AnyAlive == true)
                 {
-                    logRound = ExecuteRoundWithLog(attackTypes.Items, defenceShipTypes.Items, defenceTurrelTypes.Items, defenceTurrelTypes.Items, attackTypes.Items, defenceShipTypes.AnyAlive);
+                    var isDefenceTakeDamage = DefenceHands.Any(p => p.AnyAlive);
+                    logRound = ExecuteRoundWithLog(attackHand, defenceHand, DefenceTurrelsGroups, attackUnitsGroup, isDefenceTakeDamage);
                     logBattle.Rounds.Add(logRound);
                 }
             }
             return logBattle;
         }
 
-        private LogRound ExecuteRoundWithLog(List<UnitGroup> attackTypes, List<UnitGroup> defenceShipTypes, List<UnitGroup> defenceTurrelTypes, List<UnitGroup> currentAttackTypes, List<UnitGroup> currentDefenceShipTypes, bool isDefenceTakeDamage = true)
+        private (Hand Hand, UnitGroup Group) SelectAttackUnits(List<UnitGroup> groups)
+        {
+            return SelectAttackUnits(new List<Hand> { new Hand { UnitGroups = groups } });
+        }
+        private (Hand Hand, UnitGroup Group) SelectAttackUnits(List<Hand> hands)
+        {
+            if (!hands.Any()) return (null, null);
+            var liveHands = hands.Where(p => p.AnyAlive).ToList();
+            if (!liveHands.Any()) return (null, null);
+            if (hands.All(p => p.HasMoved))
+            {
+                hands.ForEach(p => p.HasMoved = false);
+            }
+            var hand = hands.Where(p => !p.HasMoved).OrderBy(p => p.AttackOrder).First();
+            var group = hand.SelectNextUnitGroup();
+            return (hand, group);
+        }
+
+        private LogRound ExecuteRoundWithLog(Hand attackHand, Hand defenceHand, List<UnitGroup> defenceTurrelTypes, UnitGroup currentAttackGroup, bool isDefenceTakeDamage = true)
         {
             var logRound = new LogRound
             {
                 RoundType = RoundType.AgressorFleet,
-                StartAttackFleetGroups = GetLogUnitGroups(attackTypes),
-                StartDefenceFleetGroups = GetLogUnitGroups(defenceShipTypes),
+                StartAttackFleetGroups = GetLogUnitGroups(attackHand.UnitGroups),
+                StartDefenceFleetGroups = GetLogUnitGroups(defenceHand.UnitGroups),
                 StartDefenceTurrelGroups = GetLogUnitGroups(defenceTurrelTypes)
             };
-            var result = ExecuteRound(currentAttackTypes, currentDefenceShipTypes, isDefenceTakeDamage);
-            logRound.EndAttackFleetGroups = GetLogUnitGroups(attackTypes);
-            logRound.EndDefenceFleetGroups = GetLogUnitGroups(defenceShipTypes);
-            logRound.EndDefenceTurrelGroups = GetLogUnitGroups(defenceTurrelTypes);
-            var agressor = logRound.StartAttackFleetGroups.FirstOrDefault(p => p.Nmae == result.AttackType.AnyUnit.Name);
+            var result = ExecuteRound(currentAttackGroup, defenceHand.UnitGroups, isDefenceTakeDamage);
+            logRound.StartAttackFleetGroups = GetLogUnitGroups(attackHand.UnitGroups);
+            logRound.StartDefenceFleetGroups = GetLogUnitGroups(defenceHand.UnitGroups);
+            logRound.StartDefenceTurrelGroups = GetLogUnitGroups(defenceTurrelTypes);
+            var agressor = logRound.StartAttackFleetGroups.FirstOrDefault(p => p.Nmae == result.AttackGroup.AnyUnit.Name);
             if (agressor != null)
             {
                 agressor.RoundRole = RoundRole.Agressor;
             }
-            var defender = logRound.StartDefenceFleetGroups.FirstOrDefault(p => p.Nmae == result.DefenceType.AnyUnit.Name);
+            var defender = logRound.StartDefenceFleetGroups.FirstOrDefault(p => p.Nmae == result.DefenceGroup.AnyUnit.Name);
             if (defender != null)
             {
                 defender.RoundRole = RoundRole.Defender;
             }
             else
             {
-                defender = logRound.StartDefenceTurrelGroups.FirstOrDefault(p => p.Nmae == result.DefenceType.AnyUnit.Name);
+                defender = logRound.StartDefenceTurrelGroups.FirstOrDefault(p => p.Nmae == result.DefenceGroup.AnyUnit.Name);
                 if (defender != null)
                 {
                     defender.RoundRole = RoundRole.Defender;
@@ -97,47 +121,17 @@ namespace StellarAge.BattleAnalyse.Model.Battle
             return ret;
         }
 
-        private RoundResult ExecuteRound(IEnumerable<UnitGroup> attackTypes, IEnumerable<UnitGroup> defenceTypes, bool isDefenceTakeDamage)
+        private RoundResult ExecuteRound(UnitGroup attackType, IEnumerable<UnitGroup> defenceGroups, bool isDefenceTakeDamage)
         {
-            var currentAttackType = attackTypes.OrderBy(p => p.Weight).FirstOrDefault();
-            if (currentAttackType == null)
-            {
-                return null;
-            }
-            var currentDefenceType = currentAttackType.SelectTarget(defenceTypes);
+            var currentDefenceType = attackType.SelectTarget(defenceGroups);
             var storredDefenceAttackPower = currentDefenceType.AllAliveUnitsAttackPower;
-            if (isDefenceTakeDamage) currentDefenceType.TakeDamage(currentAttackType.AllAliveUnitsAttackPower);
-            currentAttackType.TakeDamage(storredDefenceAttackPower);
+            if (isDefenceTakeDamage) currentDefenceType.TakeDamage(attackType.AllAliveUnitsAttackPower);
+            attackType.TakeDamage(storredDefenceAttackPower);
             return new RoundResult
             {
-                AttackType = currentAttackType,
-                DefenceType = currentDefenceType
+                AttackGroup = attackType,
+                DefenceGroup = currentDefenceType
             };
-        }
-
-        private UnitGroups GetUnitGroups(IEnumerable<Unit> items)
-        {
-            var ret = new UnitGroups(
-                items.GroupBy(p => p.GetType()).Select(p => new UnitGroup
-                {
-                    Units = p.ToList()
-                }).ToList());
-            return ret;
-        }
-
-        public class UnitGroups
-        {
-            public UnitGroups(List<UnitGroup> items = null)
-            {
-                Items = items ?? new List<UnitGroup>();
-            }
-            public List<UnitGroup> Items { get; set; }
-            public bool AnyAlive => Items.Any(p => p.AliveUnits.Count > 0);
-
-            public void ResetArmor()
-            {
-                Items.ForEach(p => p.ResetArmor());
-            }
         }
     }
 }

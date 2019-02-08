@@ -8,13 +8,21 @@ namespace StellarAge.BattleAnalyse.ViewModel
     [Serializable]
     public class BattleSettingsItem
     {
-        [DataMember] public List<UnitsView> AttackUnits { get; set; }
-        [DataMember] public List<UnitsView> DefenceUnits { get; set; }
+        public BattleSettingsItem()
+        {
+            AttackHands = new List<HandView>();
+            DefenceHands = new List<HandView>();
+            DefenceTurrels = new List<UnitsView>();
+        }
+        [DataMember] public List<HandView> AttackHands { get; set; }
+        [DataMember] public List<HandView> DefenceHands { get; set; }
         [DataMember] public List<UnitsView> DefenceTurrels { get; set; }
 
         public bool ReadyForSimulation()
         {
-            var ret = AttackUnits.All(p => p.Count > 0) && DefenceUnits.All(p => p.Count > 0);
+            var ret = AttackHands.Any(p => p.UnitsView.Any(pp => pp.Count > 0))
+                      && (DefenceHands.Any(p => p.UnitsView.Any(pp => pp.Count > 0))
+                || DefenceTurrels.Any(p => p.Count > 0));
             return ret;
         }
     }

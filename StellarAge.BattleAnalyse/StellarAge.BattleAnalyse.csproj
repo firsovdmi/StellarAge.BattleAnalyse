@@ -95,6 +95,7 @@
     <Compile Include="Log\RoundRole.cs" />
     <Compile Include="Log\RoundType.cs" />
     <Compile Include="Model\Battle\Battle.cs" />
+    <Compile Include="Model\Common\Hand.cs" />
     <Compile Include="Model\Ships\BB.cs" />
     <Compile Include="Model\Ships\DR.cs" />
     <Compile Include="Model\Ships\ES.cs" />
@@ -121,6 +122,7 @@
     </Compile>
     <Compile Include="ViewModel\BattleSettingsItem.cs" />
     <Compile Include="ViewModel\BattleSettingsViewModel.cs" />
+    <Compile Include="ViewModel\HandView.cs" />
     <Compile Include="ViewModel\ImageSource.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\NotifyPropertyChangedImplement.cs" />

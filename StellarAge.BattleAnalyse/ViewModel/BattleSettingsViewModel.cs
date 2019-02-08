@@ -20,40 +20,34 @@ namespace StellarAge.BattleAnalyse.ViewModel
         private ExtendedRelayCommand<CancelEventArgs> _saveCommand;
 
         public BattleSettingsItem BattleSettingsItem { get; set; }
-        public List<UnitsView> AttackUnits => BattleSettingsItem.AttackUnits;
-        public List<UnitsView> DefenceUnits => BattleSettingsItem.DefenceUnits;
+        public List<HandView> AttackHands => BattleSettingsItem.AttackHands;
+        public List<HandView> DefenceHands => BattleSettingsItem.DefenceHands;
         public List<UnitsView> DefenceTurrels => BattleSettingsItem.DefenceTurrels;
 
         public BattleSettingsViewModel()
         {
             _battleService = new BattleService();
-            BattleSettingsItem = new BattleSettingsItem
-            {
-                AttackUnits = _battleService.GetDefaultShipList(),
-                DefenceUnits = _battleService.GetDefaultShipList(),
-                DefenceTurrels = _battleService.GetDefaultTurrel()
-            };
-            var savedItem = SaveToFile.DeSerializeObject<BattleSettingsItem>(StorFileName);
-            if (savedItem != null)
-            {
-                InitViewUnits(savedItem.AttackUnits, AttackUnits);
-                InitViewUnits(savedItem.DefenceUnits, DefenceUnits);
-                InitViewUnits(savedItem.DefenceTurrels, DefenceTurrels);
-            }
+            BattleSettingsItem = RestoreFromFile() ?? InitDefaultValues();
 #if DEBUG
             _battleService.ExecuteBattle(BattleSettingsItem);
 #endif
         }
 
-        void InitViewUnits(List<UnitsView> savedUnits, List<UnitsView> currentUnits)
+        private BattleSettingsItem InitDefaultValues()
         {
-            foreach (var unit in currentUnits)
+            var ret = new BattleSettingsItem
             {
-                var saveItem = savedUnits.FirstOrDefault(pp => pp.Name == unit.Name);
-                if (saveItem == null) continue;
-                Mapper.Map(saveItem, unit);
-            }
+                AttackHands = new List<HandView> { new HandView { UnitsView = _battleService.GetDefaultShipList() } },
+                DefenceHands = new List<HandView> { new HandView { UnitsView = _battleService.GetDefaultShipList() } },
+                DefenceTurrels = _battleService.GetDefaultTurrel()
+            };
+            return ret;
+        }
 
+        private BattleSettingsItem RestoreFromFile()
+        {
+            var savedItem = SaveToFile.DeSerializeObject<BattleSettingsItem>(StorFileName);
+            return savedItem;
         }
 
         private string StorFileName => _storFileName ?? (_storFileName = Path.Combine(Environment.GetFolderPath(
@@ -75,7 +69,7 @@ namespace StellarAge.BattleAnalyse.ViewModel
         }
 
         public ExtendedRelayCommand<CancelEventArgs> SaveCommand => _saveCommand ?? (_saveCommand =
-                                                                   new ExtendedRelayCommand<CancelEventArgs>(ExecuteSaveCommand, CanExecuteSaveCommand,"Сохранить настройки"));
+                                                                   new ExtendedRelayCommand<CancelEventArgs>(ExecuteSaveCommand, CanExecuteSaveCommand, "Сохранить настройки"));
 
         private bool CanExecuteSaveCommand(CancelEventArgs arg)
         {

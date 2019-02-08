@@ -28,8 +28,8 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <controls:UnitsControl DataContext="{Binding BattleSettingsItem.AttackUnits}"/>
-            <controls:UnitsControl Grid.Column="1" DataContext="{Binding BattleSettingsItem.DefenceUnits}"/>
+            <controls:UnitsControl DataContext="{Binding BattleSettingsItem.AttackHands[0].UnitsView}"/>
+            <controls:UnitsControl Grid.Column="1" DataContext="{Binding BattleSettingsItem.DefenceHands[0].UnitsView}"/>
             <controls:UnitsControl Grid.Column="2" DataContext="{Binding BattleSettingsItem.DefenceTurrels}"/>
         </Grid>
     </Grid>

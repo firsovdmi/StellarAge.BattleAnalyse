@@ -55,27 +55,39 @@ namespace StellarAge.BattleAnalyse.Services
         public LogBattle ExecuteBattle(BattleSettingsItem battleSettingsItem)
         {
             var battle = new Battle();
-            battle.AttackFleet = GetUnitsFromViewGroups(battleSettingsItem.AttackUnits);
-            battle.DefenceFleet = GetUnitsFromViewGroups(battleSettingsItem.DefenceUnits);
-            battle.DefenceTurrels = GetUnitsFromViewGroups(battleSettingsItem.DefenceTurrels);
-           
+            battle.AttackHands = GetHandsFromViewGroups(battleSettingsItem.AttackHands);
+            battle.DefenceHands = GetHandsFromViewGroups(battleSettingsItem.DefenceHands);
+            battle.DefenceTurrelsGroups = GetUnitGroupsFromViewGroups(battleSettingsItem.DefenceTurrels);
+
             var ret = battle.SimBattle();
             return ret;
         }
 
-        List<Unit> GetUnitsFromViewGroups(List<UnitsView> unitsView)
+        private List<Hand> GetHandsFromViewGroups(List<HandView> hands)
         {
-            var ret = new List<Unit>();
-            foreach (var unitView in unitsView)
+            var ret = new List<Hand>();
+            foreach (var hand in hands)
+            {
+                var newHand = new Hand {UnitGroups = GetUnitGroupsFromViewGroups(hand.UnitsView)};
+                ret.Add(newHand);
+            }
+            return ret;
+        }
+
+        List<UnitGroup> GetUnitGroupsFromViewGroups(List<UnitsView> unitsView)
+        {
+            var ret = new List<UnitGroup>();
+            var goodViews = unitsView.Where(p => p.Count > 0 && p.UnitAttackPower > 0 && p.UnitArmor > 0).ToList();
+            foreach (var unitView in goodViews)
             {
                 var unitsGroup = GetUnitsFromView(unitView);
-                ret.AddRange(unitsGroup);
+                ret.Add(new UnitGroup { Units = unitsGroup });
             }
             return ret;
         }
         List<Unit> GetUnitsFromView(UnitsView unitView)
         {
-            var ret=new List<Unit>();
+            var ret = new List<Unit>();
             var unitType = Assembly
                 .GetAssembly(GetType())
                 .GetTypes().FirstOrDefault(t => t.Name == unitView.ClassName);

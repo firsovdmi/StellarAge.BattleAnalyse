@@ -18,7 +18,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn  Header="Объем" Binding="{Binding Weight}" IsReadOnly="True"  Width="*"/>
+                
                 <DataGridTemplateColumn Header="Атака одного" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
