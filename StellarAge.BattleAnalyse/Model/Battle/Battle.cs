@@ -17,10 +17,12 @@ namespace StellarAge.BattleAnalyse.Model.Battle
         {
 
             var logBattle = new LogBattle();
-
-
+            AttackHands.ForEach(p=>p.ResetArmor());
+            DefenceHands.ForEach(p=>p.ResetArmor());
+            DefenceTurrelsGroups.ForEach(p=>p.ResetArmor());
+            logBattle.StartAttackUnitCount = AttackHands.SelectMany(p => p.AliveUnis).Count();
             while (AttackHands.Any(p => p.AnyAlive)
-                   && (AttackHands.Any(p => p.AnyAlive) || DefenceTurrelsGroups.Any(p => p.AliveUnits.Any())))
+                   && (DefenceHands.Any(p => p.AnyAlive) || DefenceTurrelsGroups.Any(p => p.AliveUnits.Any())))
             {
                 // Раунд Атакующего
                 var values = SelectAttackUnits(AttackHands);
@@ -54,6 +56,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
                     logBattle.Rounds.Add(logRound);
                 }
             }
+            logBattle.EndAttackUnitCount = AttackHands.SelectMany(p => p.AliveUnis).Count();
             return logBattle;
         }
 
@@ -68,7 +71,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
             if (!liveHands.Any()) return (null, null);
             if (hands.All(p => p.HasMoved))
             {
-                hands.ForEach(p => p.HasMoved = false);
+                hands.ForEach(p => p.ResetMoved());
             }
             var hand = hands.Where(p => !p.HasMoved).OrderBy(p => p.AttackOrder).First();
             var group = hand.SelectNextUnitGroup();
@@ -85,9 +88,9 @@ namespace StellarAge.BattleAnalyse.Model.Battle
                 StartDefenceTurrelGroups = GetLogUnitGroups(defenceTurrelTypes)
             };
             var result = ExecuteRound(currentAttackGroup, defenceHand.UnitGroups, isDefenceTakeDamage);
-            logRound.StartAttackFleetGroups = GetLogUnitGroups(attackHand.UnitGroups);
-            logRound.StartDefenceFleetGroups = GetLogUnitGroups(defenceHand.UnitGroups);
-            logRound.StartDefenceTurrelGroups = GetLogUnitGroups(defenceTurrelTypes);
+            logRound.EndAttackFleetGroups = GetLogUnitGroups(attackHand.UnitGroups);
+            logRound.EndDefenceFleetGroups = GetLogUnitGroups(defenceHand.UnitGroups);
+            logRound.EndDefenceTurrelGroups = GetLogUnitGroups(defenceTurrelTypes);
             var agressor = logRound.StartAttackFleetGroups.FirstOrDefault(p => p.Nmae == result.AttackGroup.AnyUnit.Name);
             if (agressor != null)
             {
@@ -113,7 +116,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
         {
             var ret = groups.Select(p => new LogUnitGroup
             {
-                Count = p.Units.Count,
+                Count = p.AliveUnits.Count,
                 Nmae = p.AnyUnit.Name,
                 TotalArmor = p.UnitArmor,
                 TotalAttack = p.AllAliveUnitsAttackPower
