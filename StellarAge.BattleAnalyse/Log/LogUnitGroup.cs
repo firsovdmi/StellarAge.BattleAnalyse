@@ -7,5 +7,6 @@
         public long TotalArmor { get; set; }
         public long TotalAttack { get; set; }
         public RoundRole RoundRole { get; set; }
+        public string ClassName { get; internal set; }
     }
 }

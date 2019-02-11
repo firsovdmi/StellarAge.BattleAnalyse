@@ -17,9 +17,9 @@ namespace StellarAge.BattleAnalyse.Model.Battle
         {
 
             var logBattle = new LogBattle();
-            AttackHands.ForEach(p=>p.ResetArmor());
-            DefenceHands.ForEach(p=>p.ResetArmor());
-            DefenceTurrelsGroups.ForEach(p=>p.ResetArmor());
+            AttackHands.ForEach(p => p.ResetArmor());
+            DefenceHands.ForEach(p => p.ResetArmor());
+            DefenceTurrelsGroups.ForEach(p => p.ResetArmor());
             logBattle.StartAttackUnitCount = AttackHands.SelectMany(p => p.AliveUnis).Count();
             while (AttackHands.Any(p => p.AnyAlive)
                    && (DefenceHands.Any(p => p.AnyAlive) || DefenceTurrelsGroups.Any(p => p.AliveUnits.Any())))
@@ -29,8 +29,9 @@ namespace StellarAge.BattleAnalyse.Model.Battle
                 var attackHand = values.Hand;
                 var attackUnitsGroup = values.Group;
                 var defenceHand = DefenceHands.Where(p => p.AnyAlive).OrderBy(p => p.AttackOrder).FirstOrDefault() ??
-                                  new Hand {UnitGroups = DefenceTurrelsGroups};
+                                  new Hand { UnitGroups = DefenceTurrelsGroups };
                 var logRound = ExecuteRoundWithLog(attackHand, defenceHand, DefenceTurrelsGroups, attackUnitsGroup);
+                logRound.RoundType = RoundType.AgressorFleet;
                 logBattle.Rounds.Add(logRound);
 
                 // Раунд кораблей Обороняющегося
@@ -41,6 +42,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
                 if (defenceHand?.AnyAlive == true && attackHand?.AnyAlive == true)
                 {
                     logRound = ExecuteRoundWithLog(attackHand, defenceHand, DefenceTurrelsGroups, attackUnitsGroup);
+                    logRound.RoundType = RoundType.DefenceFleet;
                     logBattle.Rounds.Add(logRound);
                 }
 
@@ -53,6 +55,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
                 {
                     var isDefenceTakeDamage = DefenceHands.Any(p => p.AnyAlive);
                     logRound = ExecuteRoundWithLog(attackHand, defenceHand, DefenceTurrelsGroups, attackUnitsGroup, isDefenceTakeDamage);
+                    logRound.RoundType = RoundType.DefenceTurrels;
                     logBattle.Rounds.Add(logRound);
                 }
             }
@@ -95,22 +98,37 @@ namespace StellarAge.BattleAnalyse.Model.Battle
             if (agressor != null)
             {
                 agressor.RoundRole = RoundRole.Agressor;
+                logRound.StartAttackFleetDetail = GetLogShipFight(agressor, currentAttackGroup);
+                var agressorEnd = logRound.EndAttackFleetGroups.FirstOrDefault(p => p.Nmae == result.AttackGroup.AnyUnit.Name);
+                logRound.EndAttackFleetDetail = GetLogShipFight(agressorEnd, currentAttackGroup, agressor.Count - agressorEnd?.Count ?? 0);
             }
-            var defender = logRound.StartDefenceFleetGroups.FirstOrDefault(p => p.Nmae == result.DefenceGroup.AnyUnit.Name);
+            var defender = logRound.StartDefenceFleetGroups.Concat(logRound.StartDefenceTurrelGroups).FirstOrDefault(p => p.Nmae == result.DefenceGroup.AnyUnit.Name);
             if (defender != null)
             {
+                var defendGroup =
+                    defenceHand.UnitGroups.FirstOrDefault(p => p.AnyUnit.Name == result.DefenceGroup.AnyUnit.Name);
+                logRound.StartDefenceFleetDetail = GetLogShipFight(defender, defendGroup);
                 defender.RoundRole = RoundRole.Defender;
-            }
-            else
-            {
-                defender = logRound.StartDefenceTurrelGroups.FirstOrDefault(p => p.Nmae == result.DefenceGroup.AnyUnit.Name);
-                if (defender != null)
-                {
-                    defender.RoundRole = RoundRole.Defender;
-                }
+                var endDefender = logRound.EndDefenceFleetGroups.Concat(logRound.StartDefenceTurrelGroups).FirstOrDefault(p => p.Nmae == result.DefenceGroup.AnyUnit.Name);
+                logRound.EndDefenceFleetDetail = GetLogShipFight(endDefender, defendGroup, defender.Count - endDefender?.Count ?? 0);
             }
             return logRound;
         }
+
+        private LogShipFight GetLogShipFight(LogUnitGroup agressor, UnitGroup currentAttackGroup, long destroyedCount = 0)
+        {
+            var ret = new LogShipFight
+            {
+                ClassName = agressor.ClassName,
+                Count = agressor.Count,
+                Name = agressor.Nmae,
+                SingleUnitArmor = currentAttackGroup.AnyUnit.NominalArmor,
+                SingleUnitAtackPower = currentAttackGroup.AnyUnit.AttackPower,
+                DestroyedCount = destroyedCount
+            };
+            return ret;
+        }
+
 
         private List<LogUnitGroup> GetLogUnitGroups(List<UnitGroup> groups)
         {
@@ -118,6 +136,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
             {
                 Count = p.AliveUnits.Count,
                 Nmae = p.AnyUnit.Name,
+                ClassName = p.AnyUnit.GetType().Name,
                 TotalArmor = p.UnitArmor,
                 TotalAttack = p.AllAliveUnitsAttackPower
             }).ToList();

@@ -81,19 +81,45 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BattleLog.xaml.cs">
+      <DependentUpon>BattleLog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Bootstrap.cs" />
+    <Compile Include="Controls\FleetData.xaml.cs">
+      <DependentUpon>FleetData.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\LogFleetItem.xaml.cs">
+      <DependentUpon>LogFleetItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\LogFleetList.xaml.cs">
+      <DependentUpon>LogFleetList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\LogRoundControl.xaml.cs">
+      <DependentUpon>LogRoundControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ShipFight.xaml.cs">
+      <DependentUpon>ShipFight.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\UnitsControl.xaml.cs">
       <DependentUpon>UnitsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\ClassNameToImageConverter.cs" />
+    <Compile Include="Converters\ConvertorBase.cs" />
+    <Compile Include="Converters\RoundRoleVisibilityConverter.cs" />
     <Compile Include="Infrastructure\ExtendedRelayCommand.cs" />
     <Compile Include="Infrastructure\SaveToFile.cs" />
     <Compile Include="Infrastructure\SimBattleException.cs" />
     <Compile Include="Log\LogBattle.cs" />
     <Compile Include="Log\LogFleet.cs" />
     <Compile Include="Log\LogRound.cs" />
+    <Compile Include="Log\LogShipFight.cs" />
     <Compile Include="Log\LogUnitGroup.cs" />
     <Compile Include="Log\RoundRole.cs" />
     <Compile Include="Log\RoundType.cs" />
+    <Compile Include="Log\ViewModel\BattleLogViewModel.cs" />
+    <Compile Include="Log\View\BattleLogView.xaml.cs">
+      <DependentUpon>BattleLogView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\Battle\Battle.cs" />
     <Compile Include="Model\Common\Hand.cs" />
     <Compile Include="Model\Ships\BB.cs" />
@@ -129,7 +155,35 @@
     <Compile Include="ViewModel\UnitStatusDto.cs" />
     <Compile Include="ViewModel\UnitsView.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Page Include="BattleLog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\FleetData.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\LogFleetItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\LogFleetList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\LogRoundControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ShipFight.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\UnitsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Log\View\BattleLogView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -206,6 +260,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\save-file-option.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Attack.png" />
+    <Resource Include="Images\Defence.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\danger.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -7,6 +7,7 @@ using System.Threading;
 using AutoMapper;
 using GalaSoft.MvvmLight.CommandWpf;
 using StellarAge.BattleAnalyse.Infrastructure;
+using StellarAge.BattleAnalyse.Log.ViewModel;
 using StellarAge.BattleAnalyse.Services;
 
 namespace StellarAge.BattleAnalyse.ViewModel
@@ -29,7 +30,9 @@ namespace StellarAge.BattleAnalyse.ViewModel
             _battleService = new BattleService();
             BattleSettingsItem = RestoreFromFile() ?? InitDefaultValues();
 #if DEBUG
-            _battleService.ExecuteBattle(BattleSettingsItem);
+            var logBattle = _battleService.ExecuteBattle(BattleSettingsItem);
+            var battleLog = new BattleLog { DataContext = new BattleLogViewModel { LogBattle = logBattle } };
+            battleLog.Show();
 #endif
         }
 

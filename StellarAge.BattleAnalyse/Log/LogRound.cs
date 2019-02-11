@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xceed.Wpf.Toolkit;
 
 namespace StellarAge.BattleAnalyse.Log
 {
@@ -11,5 +12,9 @@ namespace StellarAge.BattleAnalyse.Log
         public List<LogUnitGroup> EndAttackFleetGroups { get; set; }
         public List<LogUnitGroup> EndDefenceFleetGroups { get; set; }
         public List<LogUnitGroup> EndDefenceTurrelGroups { get; set; }
+        public LogShipFight StartAttackFleetDetail { get; set; }
+        public LogShipFight StartDefenceFleetDetail { get; set; }
+        public LogShipFight EndAttackFleetDetail { get; set; }
+        public LogShipFight EndDefenceFleetDetail { get; set; }
     }
 }

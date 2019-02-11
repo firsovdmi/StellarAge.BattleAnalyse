@@ -14,10 +14,7 @@ namespace StellarAge.BattleAnalyse.Model.Common
         public long UnitArmor => AnyUnit.NominalArmor;
         public List<Unit> LossUnits => Units.Where(p => p.UnitStatus == UnitStatus.Destroyed).ToList();
         public bool HasMoved { get; set; }
-        public bool IsAnyUnitAlive
-        {
-            get { return Units.Any(pp => pp.UnitStatus == UnitStatus.Alive); }
-        }
+        public bool IsAnyUnitAlive => AliveUnits.Any();
 
         public UnitGroup SelectTarget(IEnumerable<UnitGroup> targets)
         {
@@ -85,6 +82,6 @@ namespace StellarAge.BattleAnalyse.Model.Common
             HasMoved = false;
         }
 
-       
+
     }
 }
