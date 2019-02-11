@@ -20,7 +20,7 @@ namespace StellarAge.BattleAnalyse.Model.Common
         {
             if (targets == null) return null;
             if (!(AnyUnit is Ship anyShip)) return null;
-            var unitGroups = targets.ToList();
+            var unitGroups = targets.Where(p=>p.IsAnyUnitAlive).ToList();
             foreach (var targetType in anyShip.TargetPriority)
             {
                 UnitGroup target = null;

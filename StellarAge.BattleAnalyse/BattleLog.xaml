@@ -9,6 +9,15 @@
         mc:Ignorable="d"
         Title="BattleLog" Height="450" Width="800">
     <Grid>
-        <view:BattleLogView/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ToolBar>
+            <Button  ToolTip="{Binding SaveCommand.ToolTip}" Click="Button_Click">
+                <Image Source="/StellarAge.BattleAnalyse;component/Images/save-file-option.png" Height="16"/>
+            </Button>
+        </ToolBar>
+        <view:BattleLogView x:Name="LogView" Grid.Row="1"/>
     </Grid>
 </Window>
