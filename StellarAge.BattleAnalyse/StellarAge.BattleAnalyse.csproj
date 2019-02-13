@@ -103,6 +103,7 @@
     <Compile Include="Controls\UnitsControl.xaml.cs">
       <DependentUpon>UnitsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BoolVisibleConverter.cs" />
     <Compile Include="Converters\ClassNameToImageConverter.cs" />
     <Compile Include="Converters\ConvertorBase.cs" />
     <Compile Include="Converters\RoundRoleVisibilityConverter.cs" />
@@ -140,7 +141,6 @@
     <Compile Include="Model\Ships\TT.cs" />
     <Compile Include="Model\Turrels\Turrel.cs" />
     <Compile Include="Model\Common\Unit.cs" />
-    <Compile Include="Model\Common\UnitGroup.cs" />
     <Compile Include="Model\Common\UnitStatus.cs" />
     <Compile Include="Services\BattleService.cs" />
     <Compile Include="Veiw\BattleSettingsView.xaml.cs">

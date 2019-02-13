@@ -28,11 +28,15 @@
         <Style TargetType="ToolBar">
             <Setter Property="Background" Value="#071527" />
         </Style>
-        <Style TargetType="ListBox">
+        <Style TargetType="{x:Type ListBox}">
+            <Setter Property="Background" Value="#071527" />
+        </Style>
+        <Style TargetType="ItemsControl">
             <Setter Property="Background" Value="#071527" />
         </Style>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="#B3B6BC" />
+            <Setter Property="Background" Value="#071527" />
         </Style>
         <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:StellarAge.BattleAnalyse.ViewModel" />
     </Application.Resources>

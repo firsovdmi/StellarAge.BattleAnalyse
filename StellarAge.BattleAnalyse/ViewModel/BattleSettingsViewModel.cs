@@ -30,9 +30,9 @@ namespace StellarAge.BattleAnalyse.ViewModel
             _battleService = new BattleService();
             BattleSettingsItem = RestoreFromFile() ?? InitDefaultValues();
 #if DEBUG
-            var logBattle = _battleService.ExecuteBattle(BattleSettingsItem);
-            var battleLog = new BattleLog { DataContext = new BattleLogViewModel { LogBattle = logBattle } };
-            battleLog.Show();
+            //var logBattle = _battleService.ExecuteBattle(BattleSettingsItem);
+            //var battleLog = new BattleLog { DataContext = new BattleLogViewModel { LogBattle = logBattle } };
+            //battleLog.Show();
 #endif
         }
 
@@ -94,7 +94,9 @@ namespace StellarAge.BattleAnalyse.ViewModel
 
         private void ExecuteStartSimulationCommand(CancelEventArgs obj)
         {
-            _battleService.ExecuteBattle(BattleSettingsItem);
+            var logBattle = _battleService.ExecuteBattle(BattleSettingsItem);
+            var battleLog = new BattleLog { DataContext = new BattleLogViewModel { LogBattle = logBattle } };
+            battleLog.Show();
         }
     }
 }

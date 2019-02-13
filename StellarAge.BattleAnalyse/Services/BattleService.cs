@@ -59,6 +59,8 @@ namespace StellarAge.BattleAnalyse.Services
             battle.DefenceHands = GetHandsFromViewGroups(battleSettingsItem.DefenceHands);
             battle.DefenceTurrelsGroups = GetUnitGroupsFromViewGroups(battleSettingsItem.DefenceTurrels);
 
+//            var ttt = Battle.FastSim(battle.AttackHands, battle.DefenceHands, battle.DefenceTurrelsGroups);
+
             var ret = battle.SimBattle();
             return ret;
         }
@@ -68,37 +70,32 @@ namespace StellarAge.BattleAnalyse.Services
             var ret = new List<Hand>();
             foreach (var hand in hands)
             {
-                var newHand = new Hand {UnitGroups = GetUnitGroupsFromViewGroups(hand.UnitsView)};
+                var newHand = new Hand { UnitGroups = GetUnitGroupsFromViewGroups(hand.UnitsView) };
                 ret.Add(newHand);
             }
             return ret;
         }
 
-        List<UnitGroup> GetUnitGroupsFromViewGroups(List<UnitsView> unitsView)
+        List<Unit> GetUnitGroupsFromViewGroups(List<UnitsView> unitsView)
         {
-            var ret = new List<UnitGroup>();
+            var ret = new List<Unit>();
             var goodViews = unitsView.Where(p => p.Count > 0 && p.UnitAttackPower > 0 && p.UnitArmor > 0).ToList();
             foreach (var unitView in goodViews)
             {
                 var unitsGroup = GetUnitsFromView(unitView);
-                ret.Add(new UnitGroup { Units = unitsGroup });
+                ret.Add(unitsGroup);
             }
             return ret;
         }
-        List<Unit> GetUnitsFromView(UnitsView unitView)
+        Unit GetUnitsFromView(UnitsView unitView)
         {
-            var ret = new List<Unit>();
             var unitType = Assembly
                 .GetAssembly(GetType())
                 .GetTypes().FirstOrDefault(t => t.Name == unitView.ClassName);
-            if (unitType == null) return ret;
-            for (var i = 0; i < unitView.Count; i++)
-            {
-                var newUnit = (Unit)Activator.CreateInstance(unitType);
-                Mapper.Map(unitView, newUnit);
-                ret.Add(newUnit);
-            }
-            return ret;
+            if (unitType == null) return null;
+            var newUnit = (Unit)Activator.CreateInstance(unitType);
+            Mapper.Map(unitView, newUnit);
+            return newUnit;
         }
     }
 }

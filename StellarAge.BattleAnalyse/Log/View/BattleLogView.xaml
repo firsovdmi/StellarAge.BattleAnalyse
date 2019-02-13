@@ -7,11 +7,19 @@
              xmlns:controls="clr-namespace:StellarAge.BattleAnalyse.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <ListBox x:Name="LogList" ItemsSource="{Binding LogBattle.Rounds}">
+    <Grid Background="#071527">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="{Binding LogBattle.LossPercenatge, StringFormat='Потери {0}%'}" Margin="5"/>
+        <ListBox Grid.Row="1" x:Name="LogList" ItemsSource="{Binding LogBattle.Rounds}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <controls:LogRoundControl Margin="0,5,0,5"/>
+                    <StackPanel Orientation="Vertical">
+                        <Separator/>
+                        <controls:LogRoundControl Margin="0,5,0,5"/>
+                    </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition/>
+            <ColumnDefinition MinWidth="70"/>
         </Grid.ColumnDefinitions>
         <Image Source="{Binding ClassName, Converter={converters:ClassNameToImageConverter}}" Width="20"/>
         <Image Grid.Row="1" Grid.Column="0" Source="/StellarAge.BattleAnalyse;component/Images/danger.png" Width="20"  />

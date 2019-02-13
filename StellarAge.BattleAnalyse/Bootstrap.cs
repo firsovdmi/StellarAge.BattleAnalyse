@@ -17,7 +17,9 @@ namespace StellarAge.BattleAnalyse
             {
                 cfg.CreateMap<UnitsView, UnitsView>();
                 cfg.CreateMap<UnitsView, Unit>()
-                    .ForMember(p=>p.NominalArmor, p=>p.MapFrom(pp=>pp.UnitArmor))
+                    .ForMember(p => p.NominalUnitArmor, p => p.MapFrom(pp => pp.UnitArmor))
+                    .ForMember(p => p.NominalUnitsCount, p => p.MapFrom(pp => pp.Count))
+                    .ForMember(p => p.UnitsCount, p => p.MapFrom(pp => pp.Count))
                     .ForMember(p => p.AttackPower, p => p.MapFrom(pp => pp.UnitAttackPower));
             });
         }

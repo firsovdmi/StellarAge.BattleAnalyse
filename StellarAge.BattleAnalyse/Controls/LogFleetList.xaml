@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemsSource="{Binding}" BorderThickness="0">
+        <ListBox  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemsSource="{Binding}" BorderThickness="0">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel IsItemsHost="True" />
@@ -15,7 +15,7 @@
             </ListBox.ItemsPanel>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                        <local:LogFleetItem />
+                        <local:LogFleetItem/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

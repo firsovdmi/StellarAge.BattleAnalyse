@@ -4,7 +4,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
 {
     internal class RoundResult
     {
-        public UnitGroup AttackGroup { get; set; }
-        public UnitGroup DefenceGroup { get; set; }
+        public Unit AttackGroup { get; set; }
+        public Unit DefenceGroup { get; set; }
     }
 }

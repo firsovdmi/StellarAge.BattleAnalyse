@@ -17,7 +17,7 @@ namespace StellarAge.BattleAnalyse.Log
             get
             {
                 if (StartAttackUnitCount == 0) return 0;
-                var ret = (StartAttackUnitCount - EndAttackUnitCount) * 100 / StartAttackUnitCount;
+                var ret =100-  EndAttackUnitCount * 100 / StartAttackUnitCount;
                 return ret;
             }
         }
