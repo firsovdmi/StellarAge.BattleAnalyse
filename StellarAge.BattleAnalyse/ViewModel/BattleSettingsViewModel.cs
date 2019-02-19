@@ -19,6 +19,7 @@ namespace StellarAge.BattleAnalyse.ViewModel
         private ExtendedRelayCommand<CancelEventArgs> _startSimulationCommand;
         private string _storFileName;
         private ExtendedRelayCommand<CancelEventArgs> _saveCommand;
+        private ExtendedRelayCommand<CancelEventArgs> _startOptimizationCommand;
 
         public BattleSettingsItem BattleSettingsItem { get; set; }
         public List<HandView> AttackHands => BattleSettingsItem.AttackHands;
@@ -95,6 +96,20 @@ namespace StellarAge.BattleAnalyse.ViewModel
         private void ExecuteStartSimulationCommand(CancelEventArgs obj)
         {
             var logBattle = _battleService.ExecuteBattle(BattleSettingsItem);
+            var battleLog = new BattleLog { DataContext = new BattleLogViewModel { LogBattle = logBattle } };
+            battleLog.Show();
+        }
+        public ExtendedRelayCommand<CancelEventArgs> StartOptimizationCommand => _startOptimizationCommand ?? (_startOptimizationCommand =
+                                                                   new ExtendedRelayCommand<CancelEventArgs>(ExecuteStartOptimizationCommand, CanExecuteStartOptimizationCommand, "Запустить оптимизацию"));
+
+        private bool CanExecuteStartOptimizationCommand(CancelEventArgs arg)
+        {
+            return true; // BattleSettingsItem.ReadyForOptimization();
+        }
+
+        private void ExecuteStartOptimizationCommand(CancelEventArgs obj)
+        {
+            var logBattle = _battleService.Optimize(BattleSettingsItem);
             var battleLog = new BattleLog { DataContext = new BattleLogViewModel { LogBattle = logBattle } };
             battleLog.Show();
         }

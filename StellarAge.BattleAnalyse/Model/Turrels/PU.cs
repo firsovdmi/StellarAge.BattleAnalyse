@@ -6,6 +6,7 @@ namespace StellarAge.BattleAnalyse.Model.Turrels
 {
     class PU : Turrel
     {
+        public override bool IsBattle => false;
         public override string Name => "Плазменная установка";
         public override long Weight => 1000;
         public override List<Type> TargetPriority => new List<Type>

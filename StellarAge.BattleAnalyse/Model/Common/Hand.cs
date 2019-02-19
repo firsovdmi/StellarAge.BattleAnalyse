@@ -14,6 +14,7 @@ namespace StellarAge.BattleAnalyse.Model.Common
         }
     
         public bool AnyAlive => UnitGroups.Any(p => p.IsAnyAlive);
+        public bool AnyBattleUnitAlive => UnitGroups.Where(p=>p.IsBattle).Any(p => p.IsAnyAlive);
 
         public void ResetMoved()
         {
@@ -24,6 +25,7 @@ namespace StellarAge.BattleAnalyse.Model.Common
             var ret = UnitGroups
                 .Where(p => !p.HasMoved)
                 .Where(p => p.IsAnyAlive)
+                .Where(p=>p.IsBattle)
                 .OrderBy(p => p.Weight)
                 .FirstOrDefault();
             if (ret != null) ret.HasMoved = true;

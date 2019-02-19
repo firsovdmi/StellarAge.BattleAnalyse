@@ -28,5 +28,6 @@ namespace StellarAge.BattleAnalyse.Model.Ships
             typeof(TT),
         };
 
+        public override bool IsBattle => true;
     }
 }

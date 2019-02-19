@@ -7,6 +7,7 @@ namespace StellarAge.BattleAnalyse.Model.Ships
 {
     class DR : Ship
     {
+        public override bool IsBattle => true;
         public override string Name => "Дредноут";
         public override long Weight => 1500;
         public override List<Type> TargetPriority => new List<Type>

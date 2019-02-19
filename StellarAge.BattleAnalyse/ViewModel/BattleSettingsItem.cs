@@ -17,6 +17,7 @@ namespace StellarAge.BattleAnalyse.ViewModel
         [DataMember] public List<HandView> AttackHands { get; set; }
         [DataMember] public List<HandView> DefenceHands { get; set; }
         [DataMember] public List<UnitsView> DefenceTurrels { get; set; }
+        [DataMember] public decimal HandWeight { get; set; }
 
         public bool ReadyForSimulation()
         {

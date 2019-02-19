@@ -9,15 +9,15 @@ namespace StellarAge.BattleAnalyse.Log
             Rounds = new List<LogRound>();
         }
         public List<LogRound> Rounds { get; set; }
-        public long StartAttackUnitCount { get; set; }
-        public long EndAttackUnitCount { get; set; }
+        public long StartWeight { get; set; }
+        public long EndWeight { get; set; }
 
         public decimal LossPercenatge
         {
             get
             {
-                if (StartAttackUnitCount == 0) return 0;
-                var ret =100-  EndAttackUnitCount * 100 / StartAttackUnitCount;
+                if (StartWeight == 0) return 0;
+                var ret =100-  EndWeight * 100 / StartWeight;
                 return ret;
             }
         }

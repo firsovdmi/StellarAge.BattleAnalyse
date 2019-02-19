@@ -20,6 +20,8 @@ namespace StellarAge.BattleAnalyse.Model.Common
         public long NominalUnitsCount { get; set; }
         public long UnitsCount { get; set; }
         public bool IsAnyAlive => UnitsCount > 0;
+        public long TotalWeight => UnitsCount * Weight;
+        public abstract bool IsBattle { get; }
 
         public void ResetArmor()
         {
@@ -35,7 +37,7 @@ namespace StellarAge.BattleAnalyse.Model.Common
         public Unit SelectTarget(IEnumerable<Unit> targets)
         {
             if (targets == null) return null;
-           // if (!(this is Ship anyShip)) return null;
+            // if (!(this is Ship anyShip)) return null;
             var unitGroups = targets.Where(p => p.IsAnyAlive).ToList();
             foreach (var targetType in TargetPriority)
             {

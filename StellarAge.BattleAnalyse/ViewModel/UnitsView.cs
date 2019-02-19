@@ -18,6 +18,7 @@ namespace StellarAge.BattleAnalyse.ViewModel
         [DataMember]
         public string ClassName { get; set; }
 
+        public long Totalweight => Count * Weight;
         public ImageSource Image => BattleAnalyseImageSource.UnitImages[ClassName];
 
         public string Name
