@@ -22,9 +22,9 @@ namespace StellarAge.BattleAnalyse.Infrastructure
 
             try
             {
-                XmlDocument xmlDocument = new XmlDocument();
-                XmlSerializer serializer = new XmlSerializer(serializableObject.GetType());
-                using (MemoryStream stream = new MemoryStream())
+                var xmlDocument = new XmlDocument();
+                var serializer = new XmlSerializer(serializableObject.GetType());
+                using (var stream = new MemoryStream())
                 {
                     serializer.Serialize(stream, serializableObject);
                     stream.Position = 0;
@@ -49,19 +49,19 @@ namespace StellarAge.BattleAnalyse.Infrastructure
         {
             if (string.IsNullOrEmpty(fileName)) { return default(T); }
 
-            T objectOut = default(T);
+            var objectOut = default(T);
 
             try
             {
-                XmlDocument xmlDocument = new XmlDocument();
+                var xmlDocument = new XmlDocument();
                 xmlDocument.Load(fileName);
-                string xmlString = xmlDocument.OuterXml;
+                var xmlString = xmlDocument.OuterXml;
 
-                using (StringReader read = new StringReader(xmlString))
+                using (var read = new StringReader(xmlString))
                 {
-                    Type outType = typeof(T);
+                    var outType = typeof(T);
 
-                    XmlSerializer serializer = new XmlSerializer(outType);
+                    var serializer = new XmlSerializer(outType);
                     using (XmlReader reader = new XmlTextReader(read))
                     {
                         objectOut = (T)serializer.Deserialize(reader);

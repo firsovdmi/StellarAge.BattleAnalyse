@@ -27,14 +27,14 @@ namespace StellarAge.BattleAnalyse
         }
         public static RenderTargetBitmap GetImage(Window view)
         {
-            Size size = new Size(view.ActualWidth, view.ActualHeight);
+            var size = new Size(view.ActualWidth, view.ActualHeight);
             if (size.IsEmpty)
                 return null;
 
-            RenderTargetBitmap result = new RenderTargetBitmap((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32);
+            var result = new RenderTargetBitmap((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32);
 
-            DrawingVisual drawingvisual = new DrawingVisual();
-            using (DrawingContext context = drawingvisual.RenderOpen())
+            var drawingvisual = new DrawingVisual();
+            using (var context = drawingvisual.RenderOpen())
             {
                 context.DrawRectangle(new VisualBrush(view), null, new Rect(new Point(), size));
                 context.Close();
@@ -45,7 +45,7 @@ namespace StellarAge.BattleAnalyse
         }
         public static void SaveAsPng(RenderTargetBitmap src, Stream outputStream)
         {
-            PngBitmapEncoder encoder = new PngBitmapEncoder();
+            var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(src));
 
             encoder.Save(outputStream);
@@ -58,7 +58,7 @@ namespace StellarAge.BattleAnalyse
             //fileStream.Close();
 
             SnapShotPNG(LogView.LogList,new Uri( "D:\\Tmp\\Log1.png"),1);
-            Border border = (Border)VisualTreeHelper.GetChild(LogView.LogList, 0);
+            var border = (Border)VisualTreeHelper.GetChild(LogView.LogList, 0);
 
             var scrl= (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
             scrl.PageDown();
@@ -81,9 +81,9 @@ namespace StellarAge.BattleAnalyse
 
         void SaveUsingEncoder(FrameworkElement visual, string fileName, BitmapEncoder encoder)
         {
-            RenderTargetBitmap bitmap = new RenderTargetBitmap((int)visual.ActualWidth, (int)visual.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            var bitmap = new RenderTargetBitmap((int)visual.ActualWidth, (int)visual.ActualHeight, 96, 96, PixelFormats.Pbgra32);
             bitmap.Render(visual);
-            BitmapFrame frame = BitmapFrame.Create(bitmap);
+            var frame = BitmapFrame.Create(bitmap);
             encoder.Frames.Add(frame);
 
             using (var stream = File.Create(fileName))
@@ -95,17 +95,17 @@ namespace StellarAge.BattleAnalyse
         {
             try
             {
-                double actualHeight = source.RenderSize.Height;
-                double actualWidth = source.RenderSize.Width;
+                var actualHeight = source.RenderSize.Height;
+                var actualWidth = source.RenderSize.Width;
 
-                double renderHeight = actualHeight * zoom;
-                double renderWidth = actualWidth * zoom;
+                var renderHeight = actualHeight * zoom;
+                var renderWidth = actualWidth * zoom;
 
-                RenderTargetBitmap renderTarget = new RenderTargetBitmap((int)renderWidth, (int)renderHeight, 96, 96, PixelFormats.Pbgra32);
-                VisualBrush sourceBrush = new VisualBrush(source);
+                var renderTarget = new RenderTargetBitmap((int)renderWidth, (int)renderHeight, 96, 96, PixelFormats.Pbgra32);
+                var sourceBrush = new VisualBrush(source);
 
-                DrawingVisual drawingVisual = new DrawingVisual();
-                DrawingContext drawingContext = drawingVisual.RenderOpen();
+                var drawingVisual = new DrawingVisual();
+                var drawingContext = drawingVisual.RenderOpen();
 
                 using (drawingContext)
                 {
@@ -114,9 +114,9 @@ namespace StellarAge.BattleAnalyse
                 }
                 renderTarget.Render(drawingVisual);
 
-                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                var encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(renderTarget));
-                using (FileStream stream = new FileStream(destination.LocalPath, FileMode.Create, FileAccess.Write))
+                using (var stream = new FileStream(destination.LocalPath, FileMode.Create, FileAccess.Write))
                 {
                     encoder.Save(stream);
                 }

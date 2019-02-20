@@ -21,5 +21,8 @@ namespace StellarAge.BattleAnalyse.Log
                 return ret;
             }
         }
+
+        public decimal LossWeight => StartWeight - EndWeight;
+        public string Description { get; set; }
     }
 }

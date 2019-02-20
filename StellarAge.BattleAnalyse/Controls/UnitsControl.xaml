@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <DataGrid  ItemsSource="{Binding}" CanUserAddRows="False" >
+        <DataGrid RowHeaderWidth="0"  ItemsSource="{Binding}" CanUserAddRows="False" >
 
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Название" Width="Auto">

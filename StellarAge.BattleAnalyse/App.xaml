@@ -25,6 +25,12 @@
             <Setter Property="MinWidth" Value="70" />
             <Setter Property="BorderThickness" Value="0" />
         </Style>
+        <Style TargetType="xctk:LongUpDown">
+            <Setter Property="Background" Value="#071527" />
+            <Setter Property="Foreground" Value="#B3B6BC" />
+            <Setter Property="MinWidth" Value="70" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
         <Style TargetType="ToolBar">
             <Setter Property="Background" Value="#071527" />
         </Style>
@@ -37,6 +43,17 @@
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="#B3B6BC" />
             <Setter Property="Background" Value="#071527" />
+        </Style>
+        <Style TargetType="UserControl">
+            <Setter Property="Foreground" Value="#B3B6BC" />
+            <Setter Property="Background" Value="#071527" />
+        </Style>
+        <Style TargetType="Window">
+            <Setter Property="Foreground" Value="#B3B6BC" />
+            <Setter Property="Background" Value="#071527" />
+        </Style>
+        <Style TargetType="Rectangle">
+            <Setter Property="Fill" Value="#071527" />
         </Style>
         <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:StellarAge.BattleAnalyse.ViewModel" />
     </Application.Resources>

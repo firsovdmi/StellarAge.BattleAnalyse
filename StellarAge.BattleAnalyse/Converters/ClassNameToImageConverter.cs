@@ -16,7 +16,7 @@ namespace StellarAge.BattleAnalyse.Converters
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var className = value as string;
-            ImageSource image = BattleAnalyseImageSource.UnitImages[className];
+            var image = BattleAnalyseImageSource.UnitImages[className];
             return image;
         }
     }

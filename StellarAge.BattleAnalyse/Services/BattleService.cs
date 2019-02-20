@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using AutoMapper;
 using StellarAge.BattleAnalyse.Log;
 using StellarAge.BattleAnalyse.Model.Battle;
@@ -98,16 +99,20 @@ namespace StellarAge.BattleAnalyse.Services
 
         public LogBattle Optimize(BattleSettingsItem battleSettingsItem)
         {
-            var quantumWeight = battleSettingsItem.HandWeight / 1000;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var threadCount = battleSettingsItem.ThreadCount;
+            var quantumWeight = battleSettingsItem.HandWeight / (battleSettingsItem.Precision == 0 ? 1 : battleSettingsItem.Precision);
             var attackHandPattern = battleSettingsItem.AttackHands[0];
 
             var quantumList = new List<List<UnitsView>>();
             foreach (var paternUnit in attackHandPattern.UnitsView.Where(p => p.Weight > 0).Where(p => p.Count > 0))
             {
                 var unitsPerQuant = (int)Math.Max(quantumWeight / paternUnit.Weight, 1);
-                var quantumCount = (int)(battleSettingsItem.HandWeight / (unitsPerQuant * paternUnit.Weight));
+                var quantumPerHandCount = (int)(battleSettingsItem.HandWeight / (unitsPerQuant * paternUnit.Weight));
+                var quantumFromExistsUnitsCount = (int)paternUnit.Count / unitsPerQuant;
+                var quantumCount = Math.Min(quantumPerHandCount, quantumFromExistsUnitsCount);
                 var quantumListItem = new List<UnitsView>();
-                for (int i = 0; i < quantumCount; i++)
+                for (var i = 0; i < quantumCount; i++)
                 {
                     var quantomUnit = new UnitsView
                     {
@@ -123,32 +128,98 @@ namespace StellarAge.BattleAnalyse.Services
             }
 
             var combinations = new List<List<UnitsView>>();
-            Combine(quantumList,new List<UnitsView>(), battleSettingsItem.HandWeight,combinations,0);
-
+            for (var i = 0; i < quantumList.Count; i++)
+            {
+                Combine(quantumList, new List<UnitsView>(), battleSettingsItem.HandWeight, combinations, i);
+            }
             var defenceHands = GetHandsFromViewGroups(battleSettingsItem.DefenceHands);
             var defenceTurrelsGroups = GetUnitGroupsFromViewGroups(battleSettingsItem.DefenceTurrels);
-            decimal bestResult=decimal.MaxValue;
+            var bestResult = decimal.MaxValue;
             var bestIndex = 0;
-            for (var i = 0; i < combinations.Count; i++)
+
+
+
+
+            var itemsForLastThread = combinations.Count % threadCount;
+            var itemsPerThread = (combinations.Count - itemsForLastThread) / threadCount;
+            var tasksList = new Task<(decimal BestResult, int BestIndex)>[threadCount];
+            for (var i = 0; i < threadCount; i++)
             {
-                var attackHands =new List<Hand> {new Hand {UnitGroups = GetUnitGroupsFromViewGroups(combinations[i])}};
-                var result= Battle.FastSim(attackHands, defenceHands, defenceTurrelsGroups);
-                
-                if (result < bestResult)
-                {
-                    bestResult = result;
-                    bestIndex = i;
-                }
+                var startIndex = i * itemsPerThread;
+                var endIndex = startIndex + (itemsPerThread - 1);
+                if (i >= threadCount) endIndex += itemsForLastThread;
+                var newTask = ProcessParth(combinations, startIndex, endIndex, GetHandsFromViewGroups(battleSettingsItem.DefenceHands), GetUnitGroupsFromViewGroups(battleSettingsItem.DefenceTurrels));
+                tasksList[i] = newTask;
+            }
+            Task.WaitAll(tasksList);
+            foreach (var task in tasksList)
+            {
+                if (task.Result.BestResult >= bestResult) continue;
+                bestResult = task.Result.BestResult;
+                bestIndex = task.Result.BestIndex;
             }
 
-            var battle=new Battle();
-            battle.AttackHands = new List<Hand> { new Hand { UnitGroups = GetUnitGroupsFromViewGroups(combinations[bestIndex]) } };
-            battle.DefenceHands = defenceHands;
-            battle.DefenceTurrelsGroups = defenceTurrelsGroups;
+
+
+
+
+
+
+            //for (var i = 0; i < combinations.Count; i++)
+            //{
+            //    var attackHands = new List<Hand> { new Hand { UnitGroups = GetUnitGroupsFromViewGroups(combinations[i]) } };
+            //    var result = Battle.FastSim(attackHands, defenceHands, defenceTurrelsGroups);
+
+            //    if (result >= bestResult) continue;
+            //    bestResult = result;
+            //    bestIndex = i;
+            //}
+
+
+
+
+
+
+
+
+
+            var battle = new Battle
+            {
+                AttackHands =
+                    new List<Hand> { new Hand { UnitGroups = GetUnitGroupsFromViewGroups(combinations[bestIndex]) } },
+                DefenceHands = defenceHands,
+                DefenceTurrelsGroups = defenceTurrelsGroups
+            };
             var ret = battle.SimBattle();
+            watch.Stop();
+            ret.Description = $"Проведено симуляций: {combinations.Count} за {watch.ElapsedMilliseconds} мс.";
             return ret;
         }
 
+        private Task<(decimal BestResult, int BestIndex)> ProcessParth(
+            List<List<UnitsView>> combinations
+            , int startIndex
+            , int endIndex
+            , List<Hand> defenceHands
+            , List<Unit> defenceTurrelsGroups)
+        {
+            var ret = Task<(decimal BestResult, int BestIndex)>.Factory.StartNew(() =>
+            {
+                var bestResult = decimal.MaxValue;
+                var bestIndex = 0;
+                for (var i = startIndex; i <= endIndex; i++)
+                {
+                    var attackHands = new List<Hand> { new Hand { UnitGroups = GetUnitGroupsFromViewGroups(combinations[i]) } };
+                    var result = Battle.FastSim(attackHands, defenceHands, defenceTurrelsGroups);
+
+                    if (result >= bestResult) continue;
+                    bestResult = result;
+                    bestIndex = i;
+                }
+                return (bestResult, bestIndex);
+            });
+            return ret;
+        }
 
         void Combine(List<List<UnitsView>> items, List<UnitsView> addedItems, decimal handWeight, List<List<UnitsView>> combinations, int index)
         {
@@ -158,8 +229,10 @@ namespace StellarAge.BattleAnalyse.Services
             {
                 var newItem = new List<UnitsView>(addedItems) { item };
                 combinations.Add(newItem);
-                index++;
-                if (index < items.Count) Combine(items, newItem, handWeight, combinations, index);
+                for (var i = index + 1; i < items.Count; i++)
+                {
+                    Combine(items, newItem, handWeight, combinations, i);
+                }
             }
         }
 

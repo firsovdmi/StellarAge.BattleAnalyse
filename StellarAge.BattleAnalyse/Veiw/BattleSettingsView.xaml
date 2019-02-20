@@ -14,12 +14,13 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        <Rectangle Grid.RowSpan="5"></Rectangle>
         <ToolBar>
             <Button Command="{Binding StartSimulationCommand}" ToolTip="{Binding StartSimulationCommand.ToolTip}">
                 <Image Source="/StellarAge.BattleAnalyse;component/Images/play-button.png" Height="16"/>
             </Button>
             <Button Command="{Binding StartOptimizationCommand}" ToolTip="{Binding StartOptimizationCommand.ToolTip}">
-                <Image Source="/StellarAge.BattleAnalyse;component/Images/play-button.png" Height="16"/>
+                <Image Source="/StellarAge.BattleAnalyse;component/Images/light-bulb.png" Height="16"/>
             </Button>
             <Button Command="{Binding SaveCommand}" ToolTip="{Binding SaveCommand.ToolTip}">
                 <Image Source="/StellarAge.BattleAnalyse;component/Images/save-file-option.png" Height="16"/>
@@ -38,7 +39,7 @@
             <controls:UnitsControl Grid.Column="0" Grid.Row="0" DataContext="{Binding BattleSettingsItem.AttackHands[0].UnitsView}"/>
             <controls:UnitsControl Grid.Column="1" Grid.Row="0" DataContext="{Binding BattleSettingsItem.DefenceHands[0].UnitsView}"/>
             <controls:UnitsControl Grid.Column="2" Grid.Row="0" DataContext="{Binding BattleSettingsItem.DefenceTurrels}"/>
-            <Grid Grid.Column="0" Grid.Row="1">
+            <Grid Grid.Column="0" Grid.Row="1" Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
@@ -46,9 +47,14 @@
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Column="0" Grid.Row="0" Text="Объем полета"/>
-                <xctk:LongUpDown Grid.Column="1" Grid.Row="0" Value="{Binding BattleSettingsItem.HandWeight}"/>
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="Объем полета" Margin="3"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Точность (10-100)" Margin="3"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="Кол-во потоков (1-50)" Margin="3"/>
+                <xctk:LongUpDown Grid.Column="1" Grid.Row="0" Value="{Binding BattleSettingsItem.HandWeight}" Margin="3"/>
+                <xctk:LongUpDown Grid.Column="1" Grid.Row="1" Value="{Binding BattleSettingsItem.Precision}" Margin="3"/>
+                <xctk:LongUpDown Grid.Column="1" Grid.Row="2" Value="{Binding BattleSettingsItem.ThreadCount}" Minimum="1" Maximum="50" Margin="3"/>
             </Grid>
         </Grid>
     </Grid>

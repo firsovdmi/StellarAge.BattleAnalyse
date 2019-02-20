@@ -24,7 +24,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
             DefenceHands.ForEach(p => p.ResetArmor());
             DefenceTurrelsGroups.ForEach(p => p.ResetArmor());
             logBattle.StartWeight = AttackHands.Sum(p => p.UnitGroups.Sum(pp => pp.TotalWeight));
-            while (AttackHands.Any(p=>p.AnyBattleUnitAlive)
+            while (AttackHands.Any(p => p.AnyBattleUnitAlive)
                    && (DefenceHands.Any(p => p.AnyAlive) || DefenceTurrelsGroups.Any(p => p.IsAnyAlive)))
             {
                 // Раунд Атакующего
@@ -33,7 +33,10 @@ namespace StellarAge.BattleAnalyse.Model.Battle
                 var attackUnitsGroup = values.Group;
                 var defenceHand = DefenceHands.Where(p => p.AnyAlive).OrderBy(p => p.AttackOrder).FirstOrDefault() ??
                                   new Hand { UnitGroups = DefenceTurrelsGroups };
-                var logRound = ExecuteRoundWithLog(attackUnitsGroup, defenceHand.UnitGroups, true, attackHand.UnitGroups, defenceHand.UnitGroups.Concat(DefenceTurrelsGroups).ToList());
+                var defenceHandForLog =
+                    DefenceHands.Where(p => p.AnyAlive).OrderBy(p => p.AttackOrder).FirstOrDefault()?.UnitGroups;
+                defenceHandForLog = defenceHandForLog?.Concat(DefenceTurrelsGroups).ToList() ?? DefenceTurrelsGroups;
+                var logRound = ExecuteRoundWithLog(attackUnitsGroup, defenceHand.UnitGroups, true, attackHand.UnitGroups, defenceHandForLog);
                 logRound.RoundType = RoundType.AgressorFleet;
                 logBattle.Rounds.Add(logRound);
 
@@ -105,7 +108,8 @@ namespace StellarAge.BattleAnalyse.Model.Battle
                 }
             }
             var endWeight = attackHands.Sum(p => p.UnitGroups.Sum(pp => pp.TotalWeight));
-            var ret = 100 - endWeight * 100 / startWeight;
+            var ret = 100 - (decimal)endWeight * 100 / (decimal)startWeight;
+            if (endWeight <= 0) ret = 100;
             return ret;
 
         }

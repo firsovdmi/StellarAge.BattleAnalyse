@@ -12,7 +12,17 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="{Binding LogBattle.LossPercenatge, StringFormat='Потери {0}%'}" Margin="5"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
+            <TextBlock Text="{Binding LogBattle.LossPercenatge, StringFormat='Потери {0}%'}" />
+            <TextBlock Text=" ("/>
+            <TextBlock Text="{Binding LogBattle.LossWeight}"/>
+            <TextBlock>
+                <Run> m</Run>
+                <Run Typography.Variants="Superscript">3</Run>
+            </TextBlock>
+            <TextBlock Text=")   "/>
+            <TextBlock Text="{Binding LogBattle.Description}"/>
+        </StackPanel>
         <ListBox Grid.Row="1" x:Name="LogList" ItemsSource="{Binding LogBattle.Rounds}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
