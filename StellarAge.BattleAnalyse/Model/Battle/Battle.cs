@@ -24,6 +24,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
             DefenceHands.ForEach(p => p.ResetArmor());
             DefenceTurrelsGroups.ForEach(p => p.ResetArmor());
             logBattle.StartWeight = AttackHands.Sum(p => p.UnitGroups.Sum(pp => pp.TotalWeight));
+            logBattle.StartDefendedWeight = DefenceHands.Sum(p => p.UnitGroups.Sum(pp => pp.TotalWeight));
             while (AttackHands.Any(p => p.AnyBattleUnitAlive)
                    && (DefenceHands.Any(p => p.AnyAlive) || DefenceTurrelsGroups.Any(p => p.IsAnyAlive)))
             {
@@ -66,6 +67,7 @@ namespace StellarAge.BattleAnalyse.Model.Battle
                 }
             }
             logBattle.EndWeight = AttackHands.Sum(p => p.UnitGroups.Sum(pp => pp.TotalWeight));
+            logBattle.EndDefendedWeight = DefenceHands.Sum(p => p.UnitGroups.Sum(pp => pp.TotalWeight));
             return logBattle;
         }
 

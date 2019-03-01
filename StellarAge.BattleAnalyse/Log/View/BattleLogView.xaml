@@ -13,9 +13,18 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
-            <TextBlock Text="{Binding LogBattle.LossPercenatge, StringFormat='Потери {0}%'}" />
+            <TextBlock Text="{Binding LogBattle.LossPercenatge, StringFormat='Потери нап. {0}%'}" />
             <TextBlock Text=" ("/>
             <TextBlock Text="{Binding LogBattle.LossWeight}"/>
+            <TextBlock>
+                <Run> m</Run>
+                <Run Typography.Variants="Superscript">3</Run>
+            </TextBlock>
+            <TextBlock Text=")   "/>
+
+            <TextBlock Text="{Binding LogBattle.LossDefencePercenatge, StringFormat='Потери защ. {0}%'}" />
+            <TextBlock Text=" ("/>
+            <TextBlock Text="{Binding LogBattle.LossDefenderWeight}"/>
             <TextBlock>
                 <Run> m</Run>
                 <Run Typography.Variants="Superscript">3</Run>
